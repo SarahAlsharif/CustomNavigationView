@@ -62,12 +62,12 @@ struct CustomNavigationView<Content: View, Destination : View>: View {
             GeometryReader { geometry in
                 Color.white
                 VStack {
-                    ZStack {
+                    ZStack(alignment: .top) {
                         WaveShape()
                             .fill(color.opacity(0.3))
                         HStack {
-                                Image(systemName: "arrow.left")
-                                    .frame(width: 30)
+                            Image(systemName: "arrow.left")
+                                .frame(width: 30)
                                 .onTapGesture(count: 1, perform: {
                                     self.mode.wrappedValue.dismiss()
                                 }).opacity(isRoot ? 0 : 1)
@@ -90,13 +90,14 @@ struct CustomNavigationView<Content: View, Destination : View>: View {
                                 })
                         }
                         .padding([.leading,.trailing], 8)
+                        .padding(.top, geometry.safeAreaInsets.top + 8)
                         .frame(width: geometry.size.width)
                         .font(.system(size: 22))
-
+                        
                     }
-                    .frame(width: geometry.size.width, height: 90)
+                    .frame(width: geometry.size.width, height: 60 + geometry.safeAreaInsets.top)
                     .edgesIgnoringSafeArea(.top)
-
+                    
                     Spacer()
                     self.content
                         .padding()
@@ -130,5 +131,16 @@ struct WaveShape : Shape {
     }
 }
 
+
+extension UINavigationController: UIGestureRecognizerDelegate {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        interactivePopGestureRecognizer?.delegate = self
+    }
+    
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return viewControllers.count > 1
+    }
+}
 
 
